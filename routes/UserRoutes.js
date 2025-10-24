@@ -8,16 +8,18 @@ const userController = require('../controllers/userController');
 router.post('/', userController.createUser);
 
 // READ: Ruta para obtener todos los usuarios (en un futuro para administradores)
-router.get('/', userController.getUser);
+router.get('/', userController.getUsers);
 
 // READ: Ruta para obtener un usuario específico por su ID
-router.get('/:id', userController.getUserByID);
+router.get('/:id', userController.getUserById);
 
 // UPDATE: Ruta para actualizar un usuario por su ID
 router.put('/:id', userController.updateUser);
 
 // DELETE: Ruta para eliminar un usuario por su ID
 router.delete('/:id', userController.deleteUser);
+
+router.post('/login', userController.loginUser);
 
 
 module.exports = router;
