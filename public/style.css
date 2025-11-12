@@ -1,0 +1,86 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Contenedor principal de los formularios */
+.form-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+form h2 {
+    text-align: center;
+    color: #1c1e21;
+    margin-bottom: 1.5rem;
+}
+
+/* Grupo de label + input */
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #606770;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    box-sizing: border-box; /* Importante para que el padding no afecte el ancho */
+}
+
+/* Botón de envío */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1877f2;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #166fe5;
+}
+
+/* Párrafo para cambiar entre formularios */
+.form-switcher {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.form-switcher a {
+    color: #1877f2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.form-switcher a:hover {
+    text-decoration: underline;
+}
+
+/* Clase para ocultar un formulario */
+.hidden {
+    display: none;
+}
