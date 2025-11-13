@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // CREAR UN USUARIO
 exports.createUser = async (req, res) => {
@@ -118,7 +120,23 @@ exports.loginUser = async (req, res) => {
         }
         
         // 3. Login exitoso
-        res.status(200).json({ msg: 'Login exitoso', userId: usuario._id });
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            return res.status(500).json({ msg: 'JWT_SECRET no configurado en el servidor' });
+        }
+
+        const payload = {
+            user: {
+                id: usuario._id,
+                email: usuario.email,
+                username: usuario.username
+            }
+        };
+
+        const token = jwt.sign(payload, secret, { expiresIn: '2h' });
+
+        // 4. Responder con el token
+        res.status(200).json({ msg: 'Login exitoso', token, userId: usuario._id });
 
     } catch (error) {
         res.status(500).json({ msg: 'Hubo un error en el servidor', error: error.message });
