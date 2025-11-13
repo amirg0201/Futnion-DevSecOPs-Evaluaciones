@@ -14,9 +14,10 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/FutnionDB')
 
 // Importar rutas
 const userRoutes = require('./routes/UserRoutes.js'); // Ajusta la ruta según tu estructura
-
+const matchRoutes = require('./routes/MatchRoutes.js');
 // Usar rutas - VERIFICA QUE ESTÉ ESTA LÍNEA
 app.use('/api/usuarios', userRoutes); // Esto es crucial
+app.use('/api/partidos', matchRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
