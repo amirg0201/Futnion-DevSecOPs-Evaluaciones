@@ -84,3 +84,44 @@ button:hover {
 .hidden {
     display: none;
 }
+
+/* ... (tus estilos de login) ... */
+
+#matches-list {
+    margin-top: 1.5rem;
+}
+
+.match-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.match-card h3 {
+    margin: 0 0 0.5rem 0;
+}
+
+.match-card p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.join-btn {
+    margin-top: 0.5rem;
+    background-color: #28a745; /* Verde */
+}
+
+.join-btn:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+#logout-btn {
+    margin-top: 1.5rem;
+    background-color: #dc3545; /* Rojo */
+}
+
+#logout-btn:hover {
+    background-color: #c82333;
+}

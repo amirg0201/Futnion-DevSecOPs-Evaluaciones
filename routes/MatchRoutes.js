@@ -7,7 +7,6 @@ const auth = require('../middleware/auth');
 
 router.post('/', auth, matchController.createMatch);
 router.post('/:id/join', auth, matchController.joinMatch);
-router.post('/:id/leave', auth, matchController.leaveMatch);
 router.get('/', matchController.getMatches);
 router.get('/:id', matchController.getMatchById);
 router.put('/:id', auth, matchController.updateMatch);
