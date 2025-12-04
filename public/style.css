@@ -212,8 +212,8 @@ body {
 .nav-btn {
     padding: 8px 12px;
     margin-left: 10px;
-    border: none;
-    background-color: transparent;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;;
     font-weight: bold;
     font-size: 0.9rem;
     cursor: pointer;

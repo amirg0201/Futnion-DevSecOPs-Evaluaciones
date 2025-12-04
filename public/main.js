@@ -256,8 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // main.js (Añade esto a la sección 4. LÓGICA DE DATOS Y ACCIONES)
-
 /**
  * Maneja la eliminación de un partido, usando la ruta correcta según el rol.
  * @param {string} matchId - El ID del partido a eliminar.
