@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('register-form');
   const showRegisterLink = document.getElementById('show-register-link');
   const showLoginLink = document.getElementById('show-login-link');
-  
+  const navMyMatches = document.getElementById('nav-my-matches'); // Nuevo Botón
+  const myMatchesPage = document.getElementById('my-matches-page'); // Nueva Página
+  const myMatchesListDiv = document.getElementById('my-matches-list'); // Nuevo Div de lista
+// ...    
   // Variables de la App y el Modal
   const appContainer = document.getElementById('app-container');
   const homePage = document.getElementById('home-page');
@@ -81,13 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Agrupar las funciones que el UI Manager necesita
     const handlers = {
-        loadMatches, createMatch, showMatchDetails, joinMatch 
+        loadMatches, createMatch, showMatchDetails, joinMatch, loadMyMatches
     };
 
     // 2. Agrupar los elementos del DOM que el UI Manager necesita
     const elements = {
         appContainer, homePage, createPage, navHome, navCreate, navLogout, 
-        createMatchForm, matchesListDiv, modalContainer, modalBody, modalClose
+        createMatchForm, matchesListDiv, modalContainer, modalBody, modalClose, navMyMatches, myMatchesPage, myMatchesListDiv
     };
 
     // 3. ¡Llamada al módulo que se encarga de los clics y eventos!
@@ -391,6 +394,59 @@ async function handleDeleteMatch(matchId) {
   });
 
 });
+
+async function loadMyMatches() {
+    const currentUserId = localStorage.getItem('userId');
+    myMatchesListDiv.innerHTML = "Cargando tus partidos...";
+
+    try {
+        // Usamos el servicio que ya creamos antes
+        const response = await getMyMatches(); 
+        
+        if (!response.ok) throw new Error('Error al cargar tus partidos');
+        const matches = await response.json();
+        
+        if (matches.length === 0) {
+            myMatchesListDiv.innerHTML = '<p>No estás inscrito en ningún partido aún.</p>';
+            return;
+        }
+
+        // Reutilizamos el componente MatchCard.js ¡La magia de la modularidad!
+        myMatchesListDiv.innerHTML = matches.map(match => {
+            return createMatchCard(match, currentUserId);
+        }).join('');
+
+        // IMPORTANTE: Asignar eventos a los botones de ESTA lista también
+        // (Podríamos crear una función auxiliar para no repetir esto, pero por ahora copiemos)
+        
+        // 1. Botones Unirme/Dejar (en "Mis Partidos" podrías querer salirte)
+        myMatchesListDiv.querySelectorAll('.join-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                joinMatch(e.target.dataset.id); 
+            });
+        });
+
+        // 2. Tarjetas (Ver detalles)
+        myMatchesListDiv.querySelectorAll('.match-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.join-btn') || e.target.closest('.delete-btn')) return;
+                showMatchDetails(card.dataset.id);
+            });
+        });
+        
+        // 3. Botones Eliminar
+        myMatchesListDiv.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleDeleteMatch(e.target.dataset.id); 
+            });
+        });
+
+    } catch (error) {
+        myMatchesListDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+    }
+}
 
 // --- FUNCIONES AUXILIARES PARA DETECCIÓN DE CONFLICTOS ---
 
