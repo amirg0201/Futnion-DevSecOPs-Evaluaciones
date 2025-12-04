@@ -210,10 +210,38 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const match = await response.json();
 
-      // ... (Resto de la lógica de formateo del modal) ...
+      // Formateo y construcción del HTML para el modal
+      const matchDate = new Date(match.MatchDate).toLocaleString('es-ES', {
+        dateStyle: 'full',
+        timeStyle: 'short'
+      });
 
-      // Nota: Este código está incompleto aquí, pero asume la lógica de formateo
-      // del modal que ya tienes implementada.
+      let participantsList;
+      if (match.participants.length > 0) {
+        participantsList = match.participants
+          .map(user => `<li class="participant-item">${user ? user.username : 'Usuario no encontrado'}</li>`)
+          .join('');
+      } else {
+        participantsList = '<li>Aún no hay jugadores inscritos.</li>';
+      }
+
+      // Construir el HTML final del modal
+      const html = `
+        <h3>${match.MatchName}</h3>
+        <p><strong>Cuándo:</strong> ${matchDate}</p>
+        <p><strong>Dónde:</strong> ${match.LocationName}</p>
+        <p><strong>Formato:</strong> ${match.PlayersBySide} vs ${match.PlayersBySide}</p>
+        <p><strong>Organizador:</strong> ${match.creator.username}</p>
+        
+        <div class="participants-container">
+          <strong>Inscritos (${match.participants.length} / ${match.requiredPlayers}):</strong>
+          <ul class="participants-list">
+            ${participantsList}
+          </ul>
+        </div>
+      `;
+      
+      modalBody.innerHTML = html;
 
     } catch (error) {
       modalBody.innerHTML = `<p style="color: red;">${error.message}</p>`;
