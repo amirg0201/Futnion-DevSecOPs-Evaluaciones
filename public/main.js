@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <p><strong>Dónde:</strong> ${match.LocationName}</p>
         <p><strong>Formato:</strong> ${match.PlayersBySide} vs ${match.PlayersBySide}</p>
         <p><strong>Organizador:</strong> ${match.creator.username}</p>
-        
+        <p><strong>Duración:</strong> ${match.MatchDuration || '1'} horas</p>
         <div class="participants-container">
           <strong>Inscritos (${match.participants.length} / ${match.requiredPlayers}):</strong>
           <ul class="participants-list">

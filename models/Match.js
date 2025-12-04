@@ -18,9 +18,9 @@ const matchSchema = new mongoose.Schema({
     required: true 
   },
   MatchDuration: { 
-    type: String,
+    type: Number,
     required: true, 
-    trim: true
+    min: 1
   },
   requiredPlayers: {
     type: Number,
