@@ -313,3 +313,18 @@ main {
     margin: 5px 0;
     line-height: 1.4;
 }
+
+.leave-match-btn {
+    background-color: #ffc107; /* Amarillo/Naranja de advertencia */
+    color: #333;
+    /* Mismos estilos base que tus otros botones */
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.leave-match-btn:hover {
+    background-color: #e0a800;
+}

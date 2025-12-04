@@ -88,3 +88,19 @@ export const getMyMatches = async () => {
     });
     return response;
 };
+
+export const leaveMatchAPI = async (matchId) => {
+    const response = await fetch(`${API_BASE_URL}/partidos/${matchId}/leave`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    });
+    return response;
+};
+
+export const removeParticipantAPI = async (matchId, userId) => {
+    const response = await fetch(`${API_BASE_URL}/partidos/${matchId}/participants/${userId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    });
+    return response;
+};

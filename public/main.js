@@ -4,7 +4,7 @@
 // 1. IMPORTACIONES
 // ======================================
 import { initializeDashboardUI } from './components/DashboardUI.js';
-import { loginUser, registerUser, getMatches, createMatch as createMatchService, getMatchById, joinMatchAPI, deleteMatchAPI, getMyMatches } from './services/api.js';
+import { loginUser, registerUser, getMatches, createMatch as createMatchService, getMatchById, joinMatchAPI, deleteMatchAPI, getMyMatches, leaveMatchAPI } from './services/api.js';
 import { createMatchCard } from './components/MatchCard.js';
 
 // ======================================
@@ -229,6 +229,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
+      // 2. Botón Salir (Amarillo/Rojo) - ¡NUEVO!
+      container.querySelectorAll('.leave-match-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Llamamos a la función leaveMatch (que definiremos abajo)
+          leaveMatch(e.target.dataset.id); 
+        });
+      });
+
       // 2. Click en Tarjeta (Modal)
       container.querySelectorAll('.match-card').forEach(card => {
         card.addEventListener('click', (e) => {
@@ -400,4 +409,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function leaveMatch(matchId) {
+    if (!confirm('¿Quieres salirte de este partido?')) return;
+
+    try {
+        const response = await leaveMatchAPI(matchId); // <-- Servicio API
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Has salido del partido.');
+            loadMatches(); // Recargar
+            if (!document.getElementById('my-matches-page').classList.contains('hidden')) {
+                loadMyMatches();
+            }
+        } else {
+            alert(`Error: ${data.msg}`); // Aquí saldrá el mensaje del Cooldown si aplica
+        }
+    } catch (error) {
+        alert('Error de red al intentar salir.');
+    }
+}
+
+// FUNCIÓN ADMIN: EXPULSAR JUGADOR
+async function kickPlayer(matchId, userId) {
+    if (!confirm('¿Expulsar a este jugador del partido?')) return;
+
+    try {
+        const response = await removeParticipantAPI(matchId, userId); // <-- Servicio API
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Jugador eliminado.');
+            showMatchDetails(matchId); // Recargar el modal para ver que desapareció
+            loadMatches(); // Actualizar contadores del fondo
+        } else {
+            alert(`Error: ${data.msg}`);
+        }
+    } catch (error) {
+        alert('Error al expulsar.');
+    }
+  }
 });

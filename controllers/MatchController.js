@@ -167,3 +167,55 @@ exports.getMyMatches = async (req, res) => {
         res.status(500).json({ msg: 'Error al obtener tus partidos', error: error.message });
     }
 };
+
+exports.leaveMatch = async (req, res) => {
+    try {
+        const match = await Match.findById(req.params.id);
+        if (!match) return res.status(404).json({ msg: 'Partido no encontrado' });
+
+        // 1. VALIDACIÓN DE COOLDOWN (1 HORA)
+        const matchTime = new Date(match.MatchDate).getTime();
+        const currentTime = Date.now();
+        const oneHour = 60 * 60 * 1000; // milisegundos
+
+        // Si falta menos de una hora (o el partido ya pasó), no se puede salir
+        if (matchTime - currentTime < oneHour) {
+            return res.status(400).json({ 
+                msg: 'No puedes salirte. Falta menos de 1 hora para el partido.' 
+            });
+        }
+
+        // 2. Eliminar al usuario del array
+        // Filtramos para dejar a todos MENOS al usuario que hace la petición
+        match.participants = match.participants.filter(
+            participantId => participantId.toString() !== req.user.id
+        );
+
+        await match.save();
+        res.json({ msg: 'Has salido del partido exitosamente.' });
+
+    } catch (error) {
+        res.status(500).json({ msg: 'Error al salir del partido', error: error.message });
+    }
+};
+
+// ADMIN: Eliminar a un participante específico
+exports.removeParticipant = async (req, res) => {
+    try {
+        const { id, userId } = req.params; // ID del partido y ID del usuario a borrar
+        
+        const match = await Match.findById(id);
+        if (!match) return res.status(404).json({ msg: 'Partido no encontrado' });
+
+        // Eliminar al participante indicado
+        match.participants = match.participants.filter(
+            participantId => participantId.toString() !== userId
+        );
+
+        await match.save();
+        res.json({ msg: 'Participante eliminado por el administrador.' });
+
+    } catch (error) {
+        res.status(500).json({ msg: 'Error al eliminar participante', error: error.message });
+    }
+};
