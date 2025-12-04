@@ -165,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       MatchName: document.getElementById('match-name').value,
       LocationName: document.getElementById('match-location').value,
       MatchDate: document.getElementById('match-date').value,
+      MatchDuration: document.getElementById('match-duration').value,
       PlayersBySide: parseInt(document.getElementById('match-players-side').value),
       requiredPlayers: parseInt(document.getElementById('match-required').value)
     };
