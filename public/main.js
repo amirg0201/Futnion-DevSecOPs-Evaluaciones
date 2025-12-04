@@ -245,18 +245,24 @@ document.addEventListener('DOMContentLoaded', () => {
           );
 
           if (newMatchToJoin) {
-            const newMatchWindow = calculateMatchWindow(newMatchToJoin);
+              const newMatchWindow = calculateMatchWindow(newMatchToJoin);
+              console.log(`🔵 Intentando unirse a: ${newMatchToJoin.MatchName}`);
+              console.log(`   Horario: ${newMatchWindow.start.toLocaleTimeString()} - ${newMatchWindow.end.toLocaleTimeString()}`);
 
-            // B. Verificar cruces
-            for (const existingMatch of userJoinedMatches) {
-              const existingWindow = calculateMatchWindow(existingMatch);
-              
-              if (isOverlapping(existingWindow, newMatchWindow)) {
-                alert(`No puedes unirte. El horario choca con tu partido "${existingMatch.MatchName}".`);
-                return; // Cancela la unión
+              // B. Verificar cruces
+              for (const existingMatch of userJoinedMatches) {
+                const existingWindow = calculateMatchWindow(existingMatch);
+                
+                console.log(`🔸 Comparando con: ${existingMatch.MatchName}`);
+                console.log(`   Horario: ${existingWindow.start.toLocaleTimeString()} - ${existingWindow.end.toLocaleTimeString()}`);
+
+                if (isOverlapping(existingWindow, newMatchWindow)) {
+                  console.error("❌ ¡CONFLICTO DETECTADO!");
+                  alert(`No puedes unirte. El horario choca con tu partido "${existingMatch.MatchName}".`);
+                  return; // Cancela la unión
+                }
               }
             }
-          }
         }
         // --- FIN LÓGICA DE CONFLICTO ---
 
@@ -381,20 +387,21 @@ async function handleDeleteMatch(matchId) {
 function calculateMatchWindow(match) {
     const start = new Date(match.MatchDate);
     
-    // Intenta leer la duración del objeto match, o del input del formulario si no existe
-    let durationHours = match.MatchDuration;
+    // 1. INTENTAR OBTENER LA DURACIÓN (Buscamos en todos los lugares posibles)
+    // Prioridad: 1. Schema Nuevo, 2. Schema Viejo, 3. Input del Formulario
+    let rawDuration = match.MatchDuration || match.DuracionJuego || document.getElementById('match-duration')?.value;
     
-    // Si no viene en el objeto (ej: estamos creando el partido), leemos del DOM
-    if (!durationHours && document.getElementById('match-duration')) {
-        durationHours = parseFloat(document.getElementById('match-duration').value);
-    }
+    // 2. CONVERTIR A NÚMERO
+    let durationHours = parseFloat(rawDuration);
     
-    // Validación básica: si falla, asumimos 1 hora para no romper la app al leer partidos viejos
+    // 3. VALIDACIÓN DE SEGURIDAD
+    // Si el dato está corrupto o falta, asumimos 1 hora para que la validación no falle silenciosamente
     if (isNaN(durationHours) || durationHours <= 0) {
+        console.warn(`⚠️ Partido "${match.MatchName || 'Nuevo'}" sin duración válida (${rawDuration}). Usando 1h por defecto.`);
         durationHours = 1; 
     }
 
-    // Convertir horas a milisegundos
+    // 4. CALCULAR EL FINAL
     const durationMilliseconds = durationHours * 3600000;
     const end = new Date(start.getTime() + durationMilliseconds); 
 
