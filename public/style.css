@@ -328,3 +328,18 @@ main {
 .leave-match-btn:hover {
     background-color: #e0a800;
 }
+
+.kick-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 8px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+.kick-btn:hover {
+    background-color: #f3bdc5; /* Rojo muy claro */
+}

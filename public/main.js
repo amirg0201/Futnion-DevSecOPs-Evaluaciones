@@ -4,7 +4,7 @@
 // 1. IMPORTACIONES
 // ======================================
 import { initializeDashboardUI } from './components/DashboardUI.js';
-import { loginUser, registerUser, getMatches, createMatch as createMatchService, getMatchById, joinMatchAPI, deleteMatchAPI, getMyMatches, leaveMatchAPI } from './services/api.js';
+import { loginUser, registerUser, getMatches, createMatch as createMatchService, getMatchById, joinMatchAPI, deleteMatchAPI, getMyMatches, leaveMatchAPI, removeParticipantAPI } from './services/api.js';
 import { createMatchCard } from './components/MatchCard.js';
 
 // ======================================
@@ -379,31 +379,64 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) throw new Error('No se pudo cargar la información.');
       
       const match = await response.json();
+      
+      // Obtener rol para saber si mostramos el botón
+      const userRole = localStorage.getItem('userRole'); 
 
       const matchDate = new Date(match.MatchDate).toLocaleString('es-ES', {
         dateStyle: 'full', timeStyle: 'short'
       });
 
+      // --- CONSTRUCCIÓN DE LA LISTA DE JUGADORES ---
       let participantsList = '<li>Aún no hay jugadores inscritos.</li>';
+      
       if (match.participants && match.participants.length > 0) {
-        participantsList = match.participants
-          .map(user => `<li class="participant-item">${user ? user.username : 'Usuario desconocido'}</li>`)
-          .join('');
-      }
+        participantsList = match.participants.map(user => {
+            const username = user ? user.username : 'Usuario desconocido';
+            const userId = user ? user._id : null;
 
-      modalBody.innerHTML = `
+            // Si soy admin Y el usuario existe, muestro el botón X
+            let kickButton = '';
+            if (userRole === 'admin' && userId) {
+                kickButton = `<button class="kick-btn" data-match="${match._id}" data-user="${userId}" title="Expulsar jugador">❌</button>`;
+            }
+
+            return `<li class="participant-item">
+                        ${username} ${kickButton}
+                    </li>`;
+        }).join('');
+      }
+      // ---------------------------------------------
+
+      const html = `
         <h3>${match.MatchName}</h3>
         <p><strong>Cuándo:</strong> ${matchDate}</p>
         <p><strong>Duración:</strong> ${match.MatchDuration || 1} horas</p>
         <p><strong>Dónde:</strong> ${match.LocationName}</p>
-        <p><strong>Formato:</strong> ${match.PlayersBySide} vs ${match.PlayersBySide}</p>
         <p><strong>Organizador:</strong> ${match.creator ? match.creator.username : 'Sistema'}</p>
         
         <div class="participants-container">
           <strong>Inscritos (${match.participants.length} / ${match.requiredPlayers}):</strong>
-          <ul class="participants-list">${participantsList}</ul>
+          <ul class="participants-list">
+            ${participantsList}
+          </ul>
         </div>
       `;
+      
+      modalBody.innerHTML = html;
+
+      // --- ASIGNAR EVENTO A LOS BOTONES DE EXPULSIÓN ---
+      // Esto debe hacerse después de insertar el HTML
+      if (userRole === 'admin') {
+          modalBody.querySelectorAll('.kick-btn').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                  const mId = e.target.dataset.match;
+                  const uId = e.target.dataset.user;
+                  kickPlayer(mId, uId);
+              });
+          });
+      }
+
     } catch (error) {
       modalBody.innerHTML = `<p style="color: red;">${error.message}</p>`;
     }
