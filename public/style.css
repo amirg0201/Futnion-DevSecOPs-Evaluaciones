@@ -221,7 +221,7 @@ body {
     transition: background-color 0.2s;
 }
 .nav-btn:hover {
-    background-color: #f0f2f5;
+    background-color: #96c3e2;
 }
 .nav-btn.active {
     color: #1877f2;
