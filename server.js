@@ -15,7 +15,7 @@ const app = express();
 // Nota: Reemplaza la URL de VERCEL_FRONTEND_URL por la URL real de tu app en Vercel.
 const allowedOrigins = [
     // ⚠️ Importante: Reemplaza por tu URL de Vercel.
-    'futnion.vercel.app', 
+    'https://futnion.vercel.app', 
     'http://localhost:3005', // Para desarrollo local
 ];
 
