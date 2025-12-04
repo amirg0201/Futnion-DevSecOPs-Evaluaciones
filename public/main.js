@@ -159,8 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
   async function createMatch(e) {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    if (!token) return alert('Tu sesión ha expirado');
+    const currentUserId = localStorage.getItem('userId'); 
+    if (!token || !currentUserId) return alert('Tu sesión ha expirado. Intenta iniciar sesión de nuevo.');
 
+    // 1. Recolección y Conversión de Datos
     const matchData = {
       MatchName: document.getElementById('match-name').value,
       LocationName: document.getElementById('match-location').value,
@@ -183,14 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       alert(error.message);
     }
+
   }
 
   // FUNCIÓN PARA UNIRSE A PARTIDO (Usa el servicio)
   async function joinMatch(matchId) {
     const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Tu sesión ha expirado, por favor inicia sesión de nuevo.');
-      return;
+    const currentUserId = localStorage.getItem('userId'); 
+    if (!token || !currentUserId) {
+        alert('Tu sesión ha expirado, por favor inicia sesión de nuevo.');
+        return;
     }
 
     try {
