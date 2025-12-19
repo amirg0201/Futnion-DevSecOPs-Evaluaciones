@@ -4,7 +4,8 @@
 // 1. IMPORTACIONES
 // ======================================
 import { initializeDashboardUI } from './components/DashboardUI.js';
-import { loginUser, registerUser, getMatches, createMatch as createMatchService, getMatchById, joinMatchAPI, deleteMatchAPI, getMyMatches, leaveMatchAPI, removeParticipantAPI } from './services/api.js';
+import { loginUser, registerUser} from './services/authService.js';
+import {getMatches, createMatch as createMatchService, getMatchById, joinMatchAPI, deleteMatchAPI, getMyMatches, leaveMatchAPI, removeParticipantAPI } from './services/matchService.js';
 import { createMatchCard } from './components/MatchCard.js';
 
 // ======================================
