@@ -1,0 +1,54 @@
+name: Futnion DevSecOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-secure-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v3
+
+    # Paso opcional: Ejecutar pruebas si tienes scripts de test definidos
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    
+    - name: Instalar dependencias y Testear
+      run: |
+        npm install
+        # Si tienes tests configurados en package.json descomenta la siguiente línea:
+        # npm test
+
+    # Inicio de fase Docker y Seguridad
+    - name: Login en Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Construir y Subir Imagen Docker
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/futnion-app:latest
+
+    # Requisito de Seguridad (DevSecOps) - Escaneo de Imagen
+    - name: Escaneo de Vulnerabilidades con Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ secrets.DOCKER_USERNAME }}/futnion-app:latest'
+        format: 'table'
+        exit-code: '0' # Ponlo en '1' si quieres que falle el pipeline al encontrar errores graves
+        severity: 'CRITICAL,HIGH'
+
+    # Validación de Kubernetes (Simulación de despliegue)
+    - name: Validar Manifiestos de Kubernetes
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        ./kubectl apply -f k8s/deployment.yaml --dry-run=client

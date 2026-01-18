@@ -1,81 +1,53 @@
-// server.js - Versión Final para Despliegue (API Pura)
-
-require('dotenv').config(); // 1. Cargar variables de entorno (para MONGO_URI y PORT local)
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path'); // <--- NECESARIO PARA RUTAS DE ARCHIVOS
 const app = express();
 
+// 1. CONFIGURACIÓN DE CORS
+// Al estar todo en el mismo contenedor en K8s, el origen es el mismo.
+// Pero dejamos esto por seguridad y flexibilidad.
+app.use(cors()); 
 
-// ======================================
-// 1. CONFIGURACIÓN DE CORS (Seguridad en Producción)
-// ======================================
-
-// Define los orígenes permitidos. Esto es CRUCIAL para que Vercel pueda hablar con Render.
-// Nota: Reemplaza la URL de VERCEL_FRONTEND_URL por la URL real de tu app en Vercel.
-const allowedOrigins = [
-    // ⚠️ Importante: Reemplaza por tu URL de Vercel.
-    'https://futnion.vercel.app', 
-    'http://localhost:5173', // Para desarrollo local
-];
-
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Permitir peticiones sin origen (como Postman)
-        if (!origin) return callback(null, true); 
-        
-        // Si el origen está en nuestra lista blanca, permitir
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            // Rechazar el acceso si el origen no está en la lista
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
-    credentials: true,
-};
-
-// ======================================
 // 2. MIDDLEWARES
-// ======================================
-
-// Aplicar la configuración de CORS
-app.use(cors(corsOptions));
-
-// Middleware para parsear JSON (Importante: debe ir antes de las rutas)
 app.use(express.json());
 
-// La línea de express.static('public') está correctamente COMENTADA/ELIMINADA.
+// ---> AQUÍ ESTÁ EL CAMBIO CLAVE <---
+// Servir archivos estáticos de la carpeta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
-
-// ======================================
 // 3. CONEXIÓN A MONGO & RUTAS
-// ======================================
-
-// Conectar a MongoDB
-// Usamos process.env.MONGO_URI (para Render) o el fallback local (para desarrollo)
+// Nota: Para la entrega, asegura que MONGO_URI sea una URL de Mongo Atlas (Nube)
+// ya que 'localhost' en Kubernetes no funcionará igual.
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/FutnionDB')
   .then(() => console.log('✅ Conectado a MongoDB'))
   .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// Importar rutas
 const userRoutes = require('./routes/UserRoutes.js'); 
 const matchRoutes = require('./routes/MatchRoutes.js');
 
-// Usar rutas
 app.use('/api/usuarios', userRoutes); 
 app.use('/api/partidos', matchRoutes);
 
-// Ruta de prueba
+// ---> RUTAS DE FALLBACK PARA EL FRONTEND <---
+// Si alguien entra a la raíz, le damos el index.html
 app.get('/', (req, res) => {
-  res.json({ message: 'API de Futnion funcionando!' });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ======================================
+// Cualquier otra ruta que no sea API, devuelve el index.html (para que React maneje el routing)
+app.get('*', (req, res) => {
+    // Si la petición pide algo de la API y no existe, damos 404
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'Endpoint no encontrado' });
+    }
+    // Si no, devolvemos el frontend
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // 4. INICIO DEL SERVIDOR
-// ======================================
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3005; // Mantenemos tu puerto 3005
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });

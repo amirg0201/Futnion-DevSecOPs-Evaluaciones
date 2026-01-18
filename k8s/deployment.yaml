@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: futnion-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: futnion
+  template:
+    metadata:
+      labels:
+        app: futnion
+    spec:
+      containers:
+      - name: futnion-container
+        # RECUERDA: Cambiar 'tu-usuario' por tu usuario real de DockerHub
+        image: tu-usuario/futnion-app:latest
+        ports:
+        - containerPort: 3000 # Debe coincidir con el EXPOSE del Dockerfile
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: futnion-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: futnion
+  ports:
+  - port: 80
+    targetPort: 3000
