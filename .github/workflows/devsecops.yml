@@ -38,13 +38,22 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/futnion-app:latest
 
     # Requisito de Seguridad (DevSecOps) - Escaneo de Imagen
-    - name: Escaneo de Vulnerabilidades con Trivy
+    - name: Escaneo de Vulnerabilidades (Generar HTML)
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: '${{ secrets.DOCKER_USERNAME }}/futnion-app:latest'
-        format: 'table'
-        exit-code: '0' # Ponlo en '1' si quieres que falle el pipeline al encontrar errores graves
+        format: 'template'
+        template: '@/contrib/html.tpl'
+        output: 'trivy-report.html'
         severity: 'CRITICAL,HIGH'
+        exit-code: '0' # No rompemos el pipeline para poder descargar el reporte
+
+    # 2. Subir el reporte para descargarlo después
+    - name: Subir Reporte de Seguridad
+      uses: actions/upload-artifact@v4
+      with:
+        name: reporte-trivy-html
+        path: trivy-report.html
 
     # Validación de Integridad (Kubeconform - Sucesor de Kubeval)
     - name: Validar Integridad de K8s (Kubeconform)
