@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
 });
 
 // Cualquier otra ruta que no sea API, devuelve el index.html (para que React maneje el routing)
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
     // Si la petición pide algo de la API y no existe, damos 404
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'Endpoint no encontrado' });
