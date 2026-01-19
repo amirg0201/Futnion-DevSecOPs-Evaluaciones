@@ -15,7 +15,7 @@ spec:
       containers:
       - name: futnion-container
         # RECUERDA: Cambiar 'tu-usuario' por tu usuario real de DockerHub
-        image: tu-usuario/futnion-app:latest
+        image: agav020102/futnion-app:latest
         ports:
         - containerPort: 3000 # Debe coincidir con el EXPOSE del Dockerfile
         resources:
