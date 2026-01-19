@@ -46,10 +46,11 @@ jobs:
         exit-code: '0' # Ponlo en '1' si quieres que falle el pipeline al encontrar errores graves
         severity: 'CRITICAL,HIGH'
 
-    # Validación de Kubernetes (Simulación de despliegue)
-    - name: Validar Manifiestos de Kubernetes
+    # Validación de Integridad de Infraestructura (Requisito DevSecOps)
+    # Usamos Kubeval para verificar que el YAML es válido sin necesitar un cluster real.
+    - name: Validar Integridad de K8s (Kubeval)
       run: |
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        # AGREGAMOS --validate=false AQUÍ ABAJO 👇
-        ./kubectl apply -f k8s/deployment.yaml --dry-run=client --validate=false
+        wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+        tar xf kubeval-linux-amd64.tar.gz
+        chmod +x kubeval
+        ./kubeval k8s/deployment.yaml
