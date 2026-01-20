@@ -17,7 +17,7 @@ spec:
         # RECUERDA: Cambiar 'tu-usuario' por tu usuario real de DockerHub
         image: agav020102/futnion-app:latest
         ports:
-        - containerPort: 3000 # Debe coincidir con el EXPOSE del Dockerfile
+        - containerPort: 3005 # Debe coincidir con el EXPOSE del Dockerfile
         resources:
           limits:
             memory: "512Mi"
@@ -33,4 +33,4 @@ spec:
     app: futnion
   ports:
   - port: 80
-    targetPort: 3000
+    targetPort: 3005
